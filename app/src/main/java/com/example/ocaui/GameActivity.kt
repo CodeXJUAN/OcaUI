@@ -2,23 +2,21 @@ package com.example.ocaui
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 
 class GameActivity : AppCompatActivity() {
     private lateinit var gameLogic: GameLogic
     private lateinit var player1Name: String
     private lateinit var player2Name: String
 
-    private lateinit var player1NameText: TextView
-    private lateinit var player2NameText: TextView
-    private lateinit var player1ScoreText: TextView
-    private lateinit var player2ScoreText: TextView
-    private lateinit var player1Indicator: View
-    private lateinit var player2Indicator: View
+    private lateinit var player1Card: CardView
+    private lateinit var player2Card: CardView
+    private lateinit var player1Score: TextView
+    private lateinit var player2Score: TextView
     private lateinit var diceImage: ImageView
     private lateinit var rollDiceButton: Button
     private lateinit var messageText: TextView
@@ -27,7 +25,6 @@ class GameActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
 
-        // Obtener nombres de los jugadores
         player1Name = intent.getStringExtra("PLAYER1_NAME") ?: "Jugador 1"
         player2Name = intent.getStringExtra("PLAYER2_NAME") ?: "Jugador 2"
 
@@ -36,30 +33,26 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun initializeViews() {
-        player1NameText = findViewById(R.id.player1Name)
-        player2NameText = findViewById(R.id.player2Name)
-        player1ScoreText = findViewById(R.id.player1Score)
-        player2ScoreText = findViewById(R.id.player2Score)
-        player1Indicator = findViewById(R.id.player1Indicator)
-        player2Indicator = findViewById(R.id.player2Indicator)
+        player1Card = findViewById(R.id.player1Card)
+        player2Card = findViewById(R.id.player2Card)
+        player1Score = findViewById(R.id.player1Score)
+        player2Score = findViewById(R.id.player2Score)
         diceImage = findViewById(R.id.diceImage)
         rollDiceButton = findViewById(R.id.rollDiceButton)
         messageText = findViewById(R.id.messageText)
 
-        // Configurar botones de reinicio y abandono
+
         findViewById<Button>(R.id.resetGameButton).setOnClickListener { resetGame() }
         findViewById<Button>(R.id.abandonGameButton).setOnClickListener { abandonGame() }
 
-        // Mostrar nombres de jugadores
-        player1NameText.text = player1Name
-        player2NameText.text = player2Name
+        player1Score.text = "$player1Name\nCasilla: 0"
+        player2Score.text = "$player2Name\nCasilla: 0"
     }
 
     private fun setupGame() {
         gameLogic = GameLogic()
         gameLogic.startGame()
         rollDiceButton.isEnabled = true
-        messageText.text = "Missatges partida"
         updateTurnIndicator()
 
         rollDiceButton.setOnClickListener {
@@ -73,24 +66,21 @@ class GameActivity : AppCompatActivity() {
 
         val gameState = gameLogic.makeMove()
         updatePlayerPositions()
+        updateTurnIndicator()
 
         if (gameState.message.isNotEmpty()) {
             messageText.text = gameState.message
         } else {
-            messageText.text = "Missatges partida"
+            messageText.text = ""
         }
 
+
         if (gameState.gameEnded) {
+            rollDiceButton.isEnabled = false
             handleGameEnd()
         } else {
-            if (gameState.canRollAgain) {
-                // Si toca otra vez (oca), mantener el botón habilitado
-                rollDiceButton.isEnabled = true
-            } else {
-                // Si no toca otra vez, habilitar el botón para el siguiente jugador
-                rollDiceButton.isEnabled = true
-            }
-            updateTurnIndicator()
+
+            rollDiceButton.isEnabled = true
         }
     }
 
@@ -104,21 +94,21 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun updatePlayerPositions() {
-        player1ScoreText.text = gameLogic.getPlayer1Position().toString()
-        player2ScoreText.text = gameLogic.getPlayer2Position().toString()
+        player1Score.text = "$player1Name\nCasilla: ${gameLogic.getPlayer1Position()}"
+        player2Score.text = "$player2Name\nCasilla: ${gameLogic.getPlayer2Position()}"
     }
 
     private fun updateTurnIndicator() {
         val currentPlayer = gameLogic.getCurrentPlayer()
 
-        // Actualizar indicadores de turno (línea verde debajo del jugador activo)
-        if (currentPlayer == 1) {
-            player1Indicator.setBackgroundColor(getColor(R.color.teal_700))
-            player2Indicator.setBackgroundColor(getColor(android.R.color.transparent))
-        } else {
-            player1Indicator.setBackgroundColor(getColor(android.R.color.transparent))
-            player2Indicator.setBackgroundColor(getColor(R.color.teal_700))
-        }
+        player1Card.setCardBackgroundColor(
+            if (currentPlayer == 1) getColor(R.color.teal_200)
+            else getColor(android.R.color.white)
+        )
+        player2Card.setCardBackgroundColor(
+            if (currentPlayer == 2) getColor(R.color.teal_200)
+            else getColor(android.R.color.white)
+        )
     }
 
     private fun handleGameEnd() {
@@ -136,7 +126,7 @@ class GameActivity : AppCompatActivity() {
         gameLogic.resetGame()
         updatePlayerPositions()
         updateTurnIndicator()
-        messageText.text = "Missatges partida"
+        messageText.text = ""
         rollDiceButton.isEnabled = true
         diceImage.setImageResource(R.drawable.dice_1)
     }

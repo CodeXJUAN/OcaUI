@@ -15,20 +15,18 @@ class WinnerActivity : AppCompatActivity() {
         val player1Name = intent.getStringExtra("PLAYER1_NAME") ?: ""
         val player2Name = intent.getStringExtra("PLAYER2_NAME") ?: ""
 
-        // Mostrar el nombre del ganador
-        findViewById<TextView>(R.id.winnerText).text = "el $winnerName"
 
-        // Botón REPETIR - reinicia el juego con los mismos jugadores
+        findViewById<TextView>(R.id.winnerText).text = "¡Has ganado $winnerName!"
+
+
         findViewById<Button>(R.id.restartButton).setOnClickListener {
             val intent = Intent(this, GameActivity::class.java).apply {
                 putExtra("PLAYER1_NAME", player1Name)
                 putExtra("PLAYER2_NAME", player2Name)
             }
             startActivity(intent)
-            finish()
         }
 
-        // Botón INICIAR - vuelve a la pantalla de bienvenida
         findViewById<Button>(R.id.quitButton).setOnClickListener {
             val intent = Intent(this, WelcomeActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK

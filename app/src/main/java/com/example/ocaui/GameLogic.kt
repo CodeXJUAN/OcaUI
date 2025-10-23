@@ -52,12 +52,12 @@ class GameLogic {
         val currentPosition = if (currentPlayer == 1) player1Position else player2Position
         var newPosition = currentPosition + diceValue
 
-        // Si se pasa de 63, rebota
+
         if (newPosition > 63) {
             newPosition = 63 - (newPosition - 63)
         }
 
-        // Actualizar posición del jugador
+
         if (currentPlayer == 1) {
             player1Position = newPosition
         } else {
@@ -71,17 +71,17 @@ class GameLogic {
         return when {
             position == 63 -> GameResult.WIN
             position == deathCell -> {
-                // Casilla de la muerte: volver al inicio y cambiar turno
+
                 if (currentPlayer == 1) player1Position = 0 else player2Position = 0
                 switchTurn()
                 GameResult.DEATH
             }
             position in ocaCells -> {
-                // Casilla de oca: NO cambiar turno (tira otra vez)
+
                 GameResult.OCA
             }
             else -> {
-                // Casilla normal: cambiar turno
+
                 switchTurn()
                 GameResult.NORMAL
             }
